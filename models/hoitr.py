@@ -83,6 +83,7 @@ class HoiTR(nn.Module):
         action_outputs_class = self.action_cls_embed(hs)
 
         out = {
+            'feat': hs[-1],
             'human_pred_logits': human_outputs_class[-1],
             'human_pred_boxes': human_outputs_coord[-1],
             'object_pred_logits': object_outputs_class[-1],

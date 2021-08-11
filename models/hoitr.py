@@ -168,7 +168,7 @@ class SetCriterion(nn.Module):
         action_empty_weight[-1] = self.eos_coef
         self.register_buffer('action_empty_weight', action_empty_weight)
 
-    def loss_labels(self, outputs, targets, indices, num_boxes, log=True):
+    def loss_labels(self, outputs, targets, indices, num_boxes, log=False):
         """Classification loss (NLL)
         targets dicts must contain the key "labels" containing a tensor of dim [nb_target_boxes]
         """
@@ -197,11 +197,11 @@ class SetCriterion(nn.Module):
                                            dtype=torch.int64, device=action_src_logits.device)
         action_target_classes[idx] = action_target_classes_o
 
-        human_loss_ce = F.cross_entropy(human_src_logits.transpose(1, 2),
+        human_loss_ce = F.cross_entropy(human_src_logits.transpose(1, 2).float(),
                                         human_target_classes, self.human_empty_weight)
-        object_loss_ce = F.cross_entropy(object_src_logits.transpose(1, 2),
+        object_loss_ce = F.cross_entropy(object_src_logits.transpose(1, 2).float(),
                                          object_target_classes, self.object_empty_weight)
-        action_loss_ce = F.cross_entropy(action_src_logits.transpose(1, 2),
+        action_loss_ce = F.cross_entropy(action_src_logits.transpose(1, 2).float(),
                                          action_target_classes, self.action_empty_weight)
         loss_ce = human_loss_ce + object_loss_ce + 2 * action_loss_ce
         losses = {
@@ -238,6 +238,7 @@ class SetCriterion(nn.Module):
         assert 'object_pred_boxes' in outputs
 
         idx = self._get_src_permutation_idx(indices)
+        # import pdb; pdb.set_trace()
 
         human_src_boxes = outputs['human_pred_boxes'][idx]
         human_target_boxes = torch.cat([t['human_boxes'][i] for t, (_, i) in zip(targets, indices)], dim=0)

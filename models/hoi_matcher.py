@@ -82,12 +82,12 @@ class HungarianMatcher(nn.Module):
         action_cost_class = -action_out_prob[:, action_tgt_ids]
 
         # Compute the L1 cost between boxes
-        human_cost_bbox = torch.cdist(human_out_bbox, human_tgt_box, p=1)
-        object_cost_bbox = torch.cdist(object_out_bbox, object_tgt_box, p=1)
+        human_cost_bbox = torch.cdist(human_out_bbox.float(), human_tgt_box.float(), p=1)
+        object_cost_bbox = torch.cdist(object_out_bbox.float(), object_tgt_box.float(), p=1)
 
         # Compute the giou cost betwen boxes
-        human_cost_giou = -generalized_box_iou(box_cxcywh_to_xyxy(human_out_bbox), box_cxcywh_to_xyxy(human_tgt_box))
-        object_cost_giou = -generalized_box_iou(box_cxcywh_to_xyxy(object_out_bbox), box_cxcywh_to_xyxy(object_tgt_box))
+        human_cost_giou = -generalized_box_iou(box_cxcywh_to_xyxy(human_out_bbox).float(), box_cxcywh_to_xyxy(human_tgt_box).float())
+        object_cost_giou = -generalized_box_iou(box_cxcywh_to_xyxy(object_out_bbox).float(), box_cxcywh_to_xyxy(object_tgt_box).float())
 
         beta_1, beta_2 = 1.2, 1
         alpha_h, alpha_o, alpha_r = 1, 1, 2
